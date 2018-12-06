@@ -1,0 +1,22 @@
+<resources>
+
+    <string name="app_name">Осмотр АМ</string>
+    <string name="CarInspectionsList">Список осмотров</string>
+    <string name="AddCarInspection">Осмотр АМ</string>
+    <string name="OrderSearch">Поиск заказ-нарядов</string>
+
+    <string name="action_add_carinspection">Добавить осмотр АМ</string>
+    <string name="action_takephoto">Добавить фотографию</string>
+    <string name="action_searchorder">Найти заказ-наряд</string>
+    <string name="btnSync">Загрузить в основную базу</string>
+    <string name="OrderNumber">Номер заказ-наряда</string>
+    <string name="OrderDate">Дата заказ-наряда</string>
+    <string name="VIN">VIN</string>
+    <string name="ModelName">Модель</string>
+    <string name="IsSynced">Загружен</string>
+    <string name="PhotoCo">Фото</string>
+    <string name="SetOrderNumber">Укажите номер заказ-наряда.</string>
+    <string name="WifiIsOffline">Нет подключения wifi</string>
+    <string name="ErrorNumberChange">Нельзя изменить номер заказ-наряда. Заказ-наряд был загружен в базу</string>
+    <string name="action_search">Поиск осмотра</string>
+</resources>
