@@ -1,16 +1,20 @@
 package ru.ovod.carinspection.pojo;
 
+import android.support.annotation.NonNull;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Inspection {
-    int _inspectionid;
-    int number;
-    int orderid;
-    int issync;
-    Date date;
-    String model;
-    String vin;
-    int photoCo;
+    private int _inspectionid;
+    private int number;
+    private int orderid;
+    private int issync;
+    private Date date;
+    private String model;
+    private String vin;
+    private int photoCo;
 
     public Inspection(int _inspectionid, int number, int orderid, int issync, Date date, String model, String vin) {
         this._inspectionid = _inspectionid;
@@ -45,6 +49,10 @@ public class Inspection {
     public int getIssync() {
         return issync;
     }
+    private  String getIssyncString() {
+        if (this.issync == 1) { return "Загружен"; } else { return ""; }
+    }
+
 
     public void setIssync(int issync) {
         this.issync = issync;
@@ -52,6 +60,16 @@ public class Inspection {
 
     public Date getDate() {
         return date;
+    }
+    private  String getDateString() {
+        String dt;
+        if (date.getTime() == 0) {
+            dt = "";
+        }else {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd.mm.yyyy");
+            dt = dateFormat.format(date);
+        }
+        return dt;
     }
 
     public void setDate(Date date) {
@@ -80,5 +98,11 @@ public class Inspection {
 
     public void setPhotoCo(int photoCo) {
         this.photoCo = photoCo;
+    }
+
+
+    @NonNull
+    public String toString() {
+        return String.valueOf(number) + " " + getDateString() + " " + model + " " + vin + " " + getIssyncString() + " ";
     }
 }
