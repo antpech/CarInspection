@@ -16,5 +16,12 @@
         android:icon="@android:drawable/ic_menu_search"
         app:showAsAction="always" />
 
+    <item
+        android:id="@+id/action_del_photo"
+        android:title="@string/action_del_photo"
+
+        app:showAsAction="always|withText"
+        />
+
 
 </menu>

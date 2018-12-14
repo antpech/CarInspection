@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -23,6 +24,7 @@ import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
+import ru.ovod.carinspection.Network.NetworkCall;
 import ru.ovod.carinspection.adapters.AddCarInspectionAdapter;
 import ru.ovod.carinspection.helpers.SysHelper;
 import ru.ovod.carinspection.pojo.Inspection;
@@ -40,6 +42,7 @@ public class AddCarInspectionActivity extends AppCompatActivity {
     private TextView viewDate;
     private TextView viewModel;
     private TextView viewVIN;
+    private RecyclerView.LayoutManager layoutManager;
     private Button btnSync;
 
 
@@ -47,6 +50,7 @@ public class AddCarInspectionActivity extends AppCompatActivity {
     static String PREFIX = "Order";
     static final int REQUEST_TAKE_PHOTO = 3333;
     static final int REQUEST_ORDERID = 3477;
+    public int PIC_CODE=0;
 
     //Создание формы
     @Override
@@ -77,14 +81,14 @@ public class AddCarInspectionActivity extends AppCompatActivity {
 
         RecyclerView recyclerView = (RecyclerView)findViewById(R.id.imageGallery);
         recyclerView.setHasFixedSize(true);
-        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getApplicationContext(),2);
+        layoutManager = new GridLayoutManager(getApplicationContext(),2);
         recyclerView.setLayoutManager(layoutManager);
 
         adapter = new AddCarInspectionAdapter();
         recyclerView.setAdapter(adapter);
 
         setControls();
-        (new RefreshList()).execute();
+        new RefreshList().execute();
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -122,6 +126,14 @@ public class AddCarInspectionActivity extends AppCompatActivity {
 
                 return true;
 
+            case R.id.action_del_photo:
+                if (item.getTitle() != "Готово") {
+                    item.setTitle("Готово");
+                    adapter.showDelBtn(true);
+                } else {
+                    item.setTitle(R.string.action_del_photo);
+                    adapter.showDelBtn(false);
+                }
         }
         return super.onOptionsItemSelected(item);
     }
@@ -131,7 +143,7 @@ public class AddCarInspectionActivity extends AppCompatActivity {
                 || ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ) {
             ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 110);
         } else {
-            sysHelper.getPhotoHelper().takePhoto(PREFIX, inspection.getNumber());
+            sysHelper.getPhotoHelper().takePhoto(this, PREFIX, inspection.getNumber());
         }
 
     }
@@ -260,7 +272,11 @@ public class AddCarInspectionActivity extends AppCompatActivity {
 
 
     private void syncData() {
-        if ((inspection == null) || (inspection.getNumber() <= 0)) {
+        if (inspection == null) {
+            saveInspection();
+        }
+
+         if (inspection.getNumber() <= 0) {
             sysHelper.showToAst(getString(R.string.SetOrderNumber));
             return;
         }
@@ -270,10 +286,9 @@ public class AddCarInspectionActivity extends AppCompatActivity {
         }
 
         if (inspection.getOrderid() > 0) {
-            //TODO Загрузить в основную базу
+            (new NetworkCall()).fileUpload(adapter, inspection, sysHelper);
         }
     }
-
 
 
     @Override
@@ -281,7 +296,7 @@ public class AddCarInspectionActivity extends AppCompatActivity {
         if (requestCode == 110) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED
                     && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
-                sysHelper.getPhotoHelper().takePhoto(PREFIX, inspection.getNumber());
+                sysHelper.getPhotoHelper().takePhoto(this, PREFIX, inspection.getNumber());
             }
         }
 
@@ -321,6 +336,17 @@ public class AddCarInspectionActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        // Checks the orientation of the screen
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            ((GridLayoutManager) layoutManager).setSpanCount(4);
+        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT){
+            ((GridLayoutManager) layoutManager).setSpanCount(2);
+        }
+    }
 
 }
 

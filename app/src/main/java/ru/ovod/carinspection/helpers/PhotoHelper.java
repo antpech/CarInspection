@@ -20,15 +20,9 @@ import ru.ovod.carinspection.BuildConfig;
 public class PhotoHelper {
     String mCurrentPhotoPath;
     String mCurrentPhotoName;
-    SysHelper sysHelper;
 
     static final int REQUEST_TAKE_PHOTO = 3333;
-    public PhotoHelper(SysHelper sysHelper) {
-        this.sysHelper = sysHelper;
-    }
-    public PhotoHelper() {
-        this.sysHelper = null;
-    }
+    public PhotoHelper(){};
     public String getmCurrentPhotoPath() {
         return mCurrentPhotoPath;
     }
@@ -37,11 +31,11 @@ public class PhotoHelper {
         return mCurrentPhotoName;
     }
 
-    private File createImageFile(String prefix, int number) throws IOException {
+    private File createImageFile(Context context, String prefix, int number) throws IOException {
         // Create an image file name
         String timeStamp = new java.text.SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = prefix + "_" + String.valueOf(number) + "_" + timeStamp + "_";
-        File storageDir = sysHelper.getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(
                 imageFileName,  /* prefix */
                 ".jpg",         /* suffix */
@@ -54,9 +48,8 @@ public class PhotoHelper {
         return image;
     }
 
-    public void takePhoto(String prefix, int number) {
-        if (sysHelper != null) {
-            Context context = sysHelper.getApplicationContext();
+    public void takePhoto(Context context, String prefix, int number) {
+        if (context != null) {
             Uri photoURI;
 
             Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -65,14 +58,14 @@ public class PhotoHelper {
                 // Create the File where the photo should go
                 File photoFile = null;
                 try {
-                    photoFile = createImageFile(prefix, number);
+                    photoFile = createImageFile(context, prefix, number);
                 } catch (IOException ex) {
                     // Error occurred while creating the File
                 }
                 // Continue only if the File was successfully created
                 if (photoFile != null) {
                     if (context instanceof Activity) {
-                        photoURI = sysHelper.getUri(photoFile);
+                        photoURI = SysHelper.getUri(photoFile);
                         takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                         ((Activity) context).startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
                     } else {

@@ -2,6 +2,8 @@
 <resources>
     <dimen name="padding">20dp</dimen>
     <dimen name="padding_small">10dp</dimen>
+    <dimen name="padding_small2">5dp</dimen>
     <dimen name="big_text">40sp</dimen>
     <dimen name="margin">8dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
 </resources>

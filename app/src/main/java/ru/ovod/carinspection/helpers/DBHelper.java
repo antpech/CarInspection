@@ -213,7 +213,6 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     public Photo insPhoto(Photo photo) {
-        //TODO ВСТАВИТЬ ФОТО
         int photoID;
 
         ContentValues contentValues = new ContentValues();
@@ -327,5 +326,50 @@ public class DBHelper extends SQLiteOpenHelper {
         } catch(Exception e) {
             return null;
         }
+    }
+
+    public void updPhotoSync(String[] strings) {
+        Photo item = null;
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(PHOTO_ISSYNC, 1);
+
+        ContentValues contentValues2 = new ContentValues();
+        contentValues2.put(INSPECTION_ISSYNC, 1);
+
+        try {
+            SQLiteDatabase database = this.getWritableDatabase();
+            String SQL = "SELECT " + PHOTO_ID + ", " + PHOTO_PATH + ", " + PHOTO_NAME + ", "
+                    + PHOTO_INSPECTION + ", " + PHOTO_ISSYNC
+                    + " FROM " + PHOTO
+                    + " WHERE " + PHOTO_NAME + " = ?";
+            Cursor cursor = database.rawQuery(SQL, strings);
+            if (!cursor.isAfterLast()) {
+                while (cursor.moveToNext()) {
+                    Integer _id = cursor.getInt(cursor.getColumnIndex(PHOTO_ID));
+                    String path = cursor.getString(cursor.getColumnIndex(PHOTO_PATH));
+                    String name = cursor.getString(cursor.getColumnIndex(PHOTO_NAME));
+                    Integer isSynced = cursor.getInt(cursor.getColumnIndex(PHOTO_ISSYNC));
+                    Integer inspectionId = cursor.getInt(cursor.getColumnIndex(PHOTO_INSPECTION));
+
+                    item = new Photo(_id, path, name, isSynced, inspectionId);
+                }
+            }
+
+            if (item != null) {
+                try {
+                    database.beginTransaction();
+                    database.update(PHOTO, contentValues, PHOTO_ID + "=" + String.valueOf(item.get_photoid()), null);
+                    database.update(INSPECTION, contentValues2, INSPECTION_ID + "=" + String.valueOf(item.getInspectionid()), null);
+                    database.setTransactionSuccessful();
+                } finally {
+                    database.endTransaction();
+                }
+            }
+            database.close();
+        } catch (Exception e) {
+            Log.e(TAGDB,"updPhotoSync error: "+e.getMessage());
+        }
+
     }
 }

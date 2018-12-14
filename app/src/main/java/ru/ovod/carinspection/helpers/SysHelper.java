@@ -3,11 +3,8 @@ package ru.ovod.carinspection.helpers;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
-import android.net.Network;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.support.v4.content.FileProvider;
 import android.view.Gravity;
@@ -16,9 +13,6 @@ import android.widget.Toast;
 import java.io.File;
 
 import ru.ovod.carinspection.BuildConfig;
-
-import static android.content.Context.WIFI_SERVICE;
-import static android.support.v4.content.ContextCompat.getSystemService;
 
 public class SysHelper {
     private static SysHelper instance;
@@ -29,6 +23,7 @@ public class SysHelper {
     private SysHelper (Context context){
         applicationContext = context;
         dbhelper = new DBHelper(applicationContext);
+        photoHelper = new PhotoHelper();
     }
 
     public static SysHelper getInstance(Context context){
@@ -38,9 +33,6 @@ public class SysHelper {
             if (context != null) {
                 setApplicationContext(context);
             }
-        }
-        if (photoHelper == null) {
-            photoHelper = new PhotoHelper(instance);
         }
 
         return instance;
@@ -88,7 +80,7 @@ public class SysHelper {
         toast.show();
     }
 
-    public Uri getUri(File file) {
+    public static Uri getUri(File file) {
         Uri photoURI;
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
             /* для версси sdk < 24 */

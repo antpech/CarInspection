@@ -1,15 +1,23 @@
 package ru.ovod.carinspection.pojo;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
-import java.text.DateFormat;
+import com.google.gson.annotations.SerializedName;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class Inspection {
-    private int _inspectionid;
-    private int number;
+//public class Inspection implements Parcelable {
+public class Inspection  {
+    @SerializedName("orderid")
     private int orderid;
+
+    @SerializedName("number")
+    private int number;
+
+    private int _inspectionid;
     private int issync;
     private Date date;
     private String model;
@@ -26,6 +34,34 @@ public class Inspection {
         this.vin = vin;
     }
 
+    /*
+    public Inspection(Parcel in) {
+        orderid = in.readInt();
+        number = in.readInt();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(orderid);
+        dest.writeInt(number);
+    }
+
+    public static final Parcelable.Creator<Order> CREATOR = new Parcelable.Creator<Order>() {
+        // распаковываем объект из Parcel
+        public Inspection createFromParcel(Parcel in) {
+            return new Inspection(in);
+        }
+
+        public Inspection[] newArray(int size) {
+            return new Inspection[size];
+        }
+    };
+    */
     public int get_inspectionid() {
         return _inspectionid;
     }

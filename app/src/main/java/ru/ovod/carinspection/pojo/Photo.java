@@ -1,11 +1,11 @@
 package ru.ovod.carinspection.pojo;
 
 public class Photo {
-    int _photoid;
-    String path;
-    String name;
-    int issync;
-    int inspectionid;
+    private int _photoid;
+    private String path;
+    private String name;
+    private int issync;
+    private int inspectionid;
 
     public Photo(int _photoid, String path, String name, int issync, int inspectionid) {
         this._photoid = _photoid;

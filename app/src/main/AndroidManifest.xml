@@ -32,7 +32,10 @@
 
         <activity android:name=".AddCarInspectionActivity"
             android:label="@string/AddCarInspection"
-            android:parentActivityName=".CarInspectionsActivity" >
+            android:parentActivityName=".CarInspectionsActivity"
+            android:configChanges="orientation|screenSize"
+            >
+
 
             <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data

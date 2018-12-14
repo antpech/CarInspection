@@ -13,7 +13,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Filter;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -22,8 +21,6 @@ import ru.ovod.carinspection.adapters.CarInspectionAdapter;
 import ru.ovod.carinspection.helpers.SysHelper;
 import ru.ovod.carinspection.pojo.Inspection;
 
-
-//TODO Сделать удаление строки свайпом
 
 public class CarInspectionsActivity extends AppCompatActivity {
     private SysHelper sysHelper;
@@ -51,7 +48,7 @@ public class CarInspectionsActivity extends AppCompatActivity {
                 }
         );
 
-        (new RefreshList()).execute();
+        new RefreshList().execute();
     }
 
 /* Функции МЕНЮ */

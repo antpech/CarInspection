@@ -6,12 +6,12 @@ import android.os.Parcelable;
 import java.util.Date;
 
 public class Order implements Parcelable {
-    int orderid;
-    int number;
-    Date date;
-    String model;
-    String vin;
-    int inspectionID;
+    private int orderid;
+    private int number;
+    private Date date;
+    private String model;
+    private String vin;
+    private int inspectionID;
 
     public Order(int orderid, int number, Date date, String model, String vin) {
         this.orderid = orderid;
