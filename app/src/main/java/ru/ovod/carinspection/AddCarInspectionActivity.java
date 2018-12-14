@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
@@ -50,7 +51,6 @@ public class AddCarInspectionActivity extends AppCompatActivity {
     static String PREFIX = "Order";
     static final int REQUEST_TAKE_PHOTO = 3333;
     static final int REQUEST_ORDERID = 3477;
-    public int PIC_CODE=0;
 
     //Создание формы
     @Override
@@ -65,6 +65,9 @@ public class AddCarInspectionActivity extends AppCompatActivity {
         viewModel = findViewById(R.id.viewModel);
         viewVIN = findViewById(R.id.viewVIN);
         btnSync = findViewById(R.id.btnSync);
+
+        sysHelper.setProgressBar((ProgressBar) findViewById(R.id.progressBar));
+        sysHelper.getProgressBar().setVisibility(ProgressBar.INVISIBLE);
 
         //событие на клик
         btnSync.setOnClickListener(new View.OnClickListener() {
@@ -150,7 +153,7 @@ public class AddCarInspectionActivity extends AppCompatActivity {
     }
 
     private void takePhoto2() {
-        Intent cameraIntent = new Intent(AddCarInspectionActivity.this, Camera_capture.class);
+        Intent cameraIntent = new Intent(AddCarInspectionActivity.this, CameraCaptureActivity.class);
         cameraIntent.putExtra("Inspection", inspection);
         startActivityForResult(cameraIntent, REQUEST_TAKE_PHOTO);
     }

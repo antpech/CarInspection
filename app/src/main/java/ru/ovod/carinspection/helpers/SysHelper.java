@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.support.v4.content.FileProvider;
 import android.view.Gravity;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import java.io.File;
@@ -19,6 +20,7 @@ public class SysHelper {
     private static Context applicationContext;
     private DBHelper dbhelper;
     private static PhotoHelper photoHelper;
+    private ProgressBar progressBar;
 
     private SysHelper (Context context){
         applicationContext = context;
@@ -52,6 +54,14 @@ public class SysHelper {
 
     public static void setApplicationContext(Context applicationContext) {
         SysHelper.applicationContext = applicationContext;
+    }
+
+    public ProgressBar getProgressBar() {
+        return progressBar;
+    }
+
+    public void setProgressBar(ProgressBar progressBar) {
+        this.progressBar = progressBar;
     }
 
     // проверка доступности сети

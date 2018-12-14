@@ -52,6 +52,7 @@ public class Inspection implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(orderid);
         dest.writeInt(number);
+        dest.writeInt(_inspectionid);
     }
 
     public static final Parcelable.Creator<Inspection> CREATOR = new Parcelable.Creator<Inspection>() {

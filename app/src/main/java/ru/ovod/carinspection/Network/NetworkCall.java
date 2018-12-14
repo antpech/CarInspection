@@ -2,6 +2,7 @@ package ru.ovod.carinspection.Network;
 
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.widget.ProgressBar;
 
 import com.google.gson.Gson;
 
@@ -45,46 +46,55 @@ public class NetworkCall {
         MultipartBody.Part body = null;
         Call<ResponseModel> call = null;
 
-        ApiInterface apiInterface = RetrofitApiClient.getClient().create(ApiInterface.class);
-
-        Gson gson = new Gson();
-        String patientData = gson.toJson(new ImageSenderInfo(String.valueOf(inspection.getOrderid()), String.valueOf(inspection.getNumber())));
-        Log.e("JSON toSend:", patientData);
-
-        RequestBody description = RequestBody.create(MultipartBody.FORM, patientData);
-
         for (final Photo photo: adapter.getGalleryList()) {
             if (photo.getIssync() == 1) { continue; }
             photoCo.setCo(photoCo.getCo()+1);
         }
 
-        for (final Photo photo: adapter.getGalleryList()){
-            if (photo.getIssync() == 1) { continue; }
+        if (photoCo.getCo() > 0) {
+            sysHelper.getProgressBar().setVisibility(ProgressBar.VISIBLE);
 
-            file = new File(photo.getPath());
-            requestFile = RequestBody.create(MediaType.parse("image"), file);
-            body = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
-            call = apiInterface.fileUpload(description, body);
+            ApiInterface apiInterface = RetrofitApiClient.getClient().create(ApiInterface.class);
 
-            call.enqueue(new Callback<ResponseModel>() {
-                @Override
-                public void onResponse(@NonNull Call<ResponseModel> call, @NonNull Response<ResponseModel> response) {
-                    ResponseModel responseModel = response.body();
-                    if(responseModel != null){
-                        sysHelper.getDbhelper().updPhotoSync(new String[]{responseModel.getMessage()});
-                        photo.setIssync(1);
-                        adapter.notifyDataSetChanged();
-                        photoCo.setCo(photoCo.getCo() - 1);
-                        if (photoCo.getCo() == 0) { sysHelper.showToAst("Все фотографии загружены"); }
-                    } else
-                        Log.e("JSON toSend:", responseModel.getMessage());
+            Gson gson = new Gson();
+            String patientData = gson.toJson(inspection);
+            //new ImageSenderInfo(String.valueOf(inspection.getOrderid()), String.valueOf(inspection.getNumber())));
+            RequestBody description = RequestBody.create(MultipartBody.FORM, patientData);
+            Log.e("JSON toSend:", patientData);
+
+            for (final Photo photo : adapter.getGalleryList()) {
+                if (photo.getIssync() == 1) {
+                    continue;
                 }
 
-                @Override
-                public void onFailure(@NonNull Call<ResponseModel> call, @NonNull Throwable t) {
-                    Log.e("JSON toSend:", t.getMessage());
-                }
-            });
+                file = new File(photo.getPath());
+                requestFile = RequestBody.create(MediaType.parse("image"), file);
+                body = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
+                call = apiInterface.fileUpload(description, body);
+
+                call.enqueue(new Callback<ResponseModel>() {
+                    @Override
+                    public void onResponse(@NonNull Call<ResponseModel> call, @NonNull Response<ResponseModel> response) {
+                        ResponseModel responseModel = response.body();
+                        if (responseModel != null) {
+                            sysHelper.getDbhelper().updPhotoSync(new String[]{responseModel.getMessage()});
+                            photo.setIssync(1);
+                            photoCo.setCo(photoCo.getCo() - 1);
+                            if (photoCo.getCo() == 0) {
+                                adapter.notifyDataSetChanged();
+                                sysHelper.getProgressBar().setVisibility(ProgressBar.INVISIBLE);
+                                sysHelper.showToAst("Все фотографии загружены");
+                            }
+                        } else
+                            Log.e("JSON toSend:", responseModel.getMessage());
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull Call<ResponseModel> call, @NonNull Throwable t) {
+                        Log.e("JSON toSend:", t.getMessage());
+                    }
+                });
+            }
         }
 
 

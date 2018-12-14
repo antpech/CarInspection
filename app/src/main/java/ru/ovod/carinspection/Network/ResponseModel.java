@@ -4,14 +4,9 @@ package ru.ovod.carinspection.Network;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.google.gson.annotations.SerializedName;
-
 public class ResponseModel implements Parcelable
 {
-
-    @SerializedName("success")
     private boolean success;
-    @SerializedName("message")
     private String message;
     public final static Creator<ResponseModel> CREATOR = new Creator<ResponseModel>() {
 

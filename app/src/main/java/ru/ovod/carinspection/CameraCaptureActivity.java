@@ -21,7 +21,7 @@ import ru.ovod.carinspection.helpers.SysHelper;
 import ru.ovod.carinspection.pojo.Inspection;
 import ru.ovod.carinspection.pojo.Photo;
 
-public class Camera_capture extends AppCompatActivity implements SurfaceHolder.Callback {
+public class CameraCaptureActivity extends AppCompatActivity implements SurfaceHolder.Callback {
 
     private Camera mCamera;
     private SurfaceView surfaceView;
@@ -52,7 +52,7 @@ public class Camera_capture extends AppCompatActivity implements SurfaceHolder.C
         });
         surfaceView = (SurfaceView) findViewById(R.id.surfaceview);
         surfaceHolder = surfaceView.getHolder();
-        surfaceHolder.addCallback(Camera_capture.this);
+        surfaceHolder.addCallback(CameraCaptureActivity.this);
         surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
         openCamera();
