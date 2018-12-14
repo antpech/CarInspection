@@ -143,9 +143,16 @@ public class AddCarInspectionActivity extends AppCompatActivity {
                 || ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ) {
             ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 110);
         } else {
-            sysHelper.getPhotoHelper().takePhoto(this, PREFIX, inspection.getNumber());
+            takePhoto2();
+            //sysHelper.getPhotoHelper().takePhoto(this, PREFIX, inspection.getNumber());
         }
 
+    }
+
+    private void takePhoto2() {
+        Intent cameraIntent = new Intent(AddCarInspectionActivity.this, Camera_capture.class);
+        cameraIntent.putExtra("Inspection", inspection);
+        startActivityForResult(cameraIntent, REQUEST_TAKE_PHOTO);
     }
 
     private void searchOrder(Activity activity) {
@@ -296,7 +303,8 @@ public class AddCarInspectionActivity extends AppCompatActivity {
         if (requestCode == 110) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED
                     && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
-                sysHelper.getPhotoHelper().takePhoto(this, PREFIX, inspection.getNumber());
+                takePhoto2();
+                //sysHelper.getPhotoHelper().takePhoto(this, PREFIX, inspection.getNumber());
             }
         }
 
@@ -316,12 +324,15 @@ public class AddCarInspectionActivity extends AppCompatActivity {
 
         // обработаем получение фото
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
+            (new RefreshList()).execute();
             // запишем информацию о фото в базу
+            /*
             Photo photo = new Photo(0
                     ,sysHelper.getPhotoHelper().getmCurrentPhotoPath()
                     ,sysHelper.getPhotoHelper().getmCurrentPhotoName(), 0, inspection.get_inspectionid());
             photo = sysHelper.getDbhelper().insPhoto(photo);
             adapter.add(photo);
+            */
         }
 
         // обработаем получение OrderID

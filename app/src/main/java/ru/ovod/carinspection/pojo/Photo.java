@@ -1,6 +1,9 @@
 package ru.ovod.carinspection.pojo;
 
-public class Photo {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Photo implements Parcelable {
     private int _photoid;
     private String path;
     private String name;
@@ -14,6 +17,38 @@ public class Photo {
         this.issync = issync;
         this.inspectionid = inspectionid;
     }
+
+    public Photo(Parcel in) {
+        _photoid = in.readInt();
+        path = in.readString();
+        name = in.readString();
+        issync = in.readInt();
+        inspectionid = in.readInt();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(_photoid);
+        dest.writeString(path);
+        dest.writeString(name);
+        dest.writeInt(inspectionid);
+    }
+
+    public static final Parcelable.Creator<Photo> CREATOR = new Parcelable.Creator<Photo>() {
+        // распаковываем объект из Parcel
+        public Photo createFromParcel(Parcel in) {
+            return new Photo(in);
+        }
+
+        public Photo[] newArray(int size) {
+            return new Photo[size];
+        }
+    };
 
     public int get_photoid() {
         return _photoid;

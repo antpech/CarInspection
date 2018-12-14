@@ -31,7 +31,7 @@ public class PhotoHelper {
         return mCurrentPhotoName;
     }
 
-    private File createImageFile(Context context, String prefix, int number) throws IOException {
+    public File createImageFile(Context context, String prefix, int number) throws IOException {
         // Create an image file name
         String timeStamp = new java.text.SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = prefix + "_" + String.valueOf(number) + "_" + timeStamp + "_";

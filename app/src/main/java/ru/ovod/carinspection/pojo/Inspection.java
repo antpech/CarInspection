@@ -9,12 +9,11 @@ import com.google.gson.annotations.SerializedName;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-//public class Inspection implements Parcelable {
-public class Inspection  {
-    @SerializedName("orderid")
+public class Inspection implements Parcelable {
+    //@SerializedName("orderid")
     private int orderid;
 
-    @SerializedName("number")
+    //@SerializedName("number")
     private int number;
 
     private int _inspectionid;
@@ -34,10 +33,14 @@ public class Inspection  {
         this.vin = vin;
     }
 
-    /*
     public Inspection(Parcel in) {
         orderid = in.readInt();
         number = in.readInt();
+        _inspectionid = in.readInt();
+        date = new Date(in.readLong());
+        model = in.readString();
+        vin = in.readString();
+        photoCo = in.readInt();
     }
 
     @Override
@@ -51,7 +54,7 @@ public class Inspection  {
         dest.writeInt(number);
     }
 
-    public static final Parcelable.Creator<Order> CREATOR = new Parcelable.Creator<Order>() {
+    public static final Parcelable.Creator<Inspection> CREATOR = new Parcelable.Creator<Inspection>() {
         // распаковываем объект из Parcel
         public Inspection createFromParcel(Parcel in) {
             return new Inspection(in);
@@ -61,7 +64,8 @@ public class Inspection  {
             return new Inspection[size];
         }
     };
-    */
+
+
     public int get_inspectionid() {
         return _inspectionid;
     }

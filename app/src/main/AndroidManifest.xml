@@ -9,6 +9,7 @@
 
     <uses-feature android:name="android.hardware.camera"
         android:required="false" />
+    <uses-feature android:name="android.hardware.camera.autofocus" />
     <uses-feature android:name="android.hardware.location.gps" />
 
 
@@ -45,6 +46,16 @@
 
         <activity android:name=".OrderSearchActivity"
             android:label="@string/OrderSearch"
+            android:parentActivityName=".AddCarInspectionActivity" >
+
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".AddCarInspectionActivity" />
+        </activity>
+
+        <activity android:name=".Camera_capture"
+            android:label="Камера"
             android:parentActivityName=".AddCarInspectionActivity" >
 
             <!-- Parent activity meta-data to support 4.0 and lower -->
