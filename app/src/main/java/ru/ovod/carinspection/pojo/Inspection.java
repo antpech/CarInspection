@@ -22,6 +22,7 @@ public class Inspection implements Parcelable {
     private String model;
     private String vin;
     private int photoCo;
+    private String path;
 
     public Inspection(int _inspectionid, int number, int orderid, int issync, Date date, String model, String vin) {
         this._inspectionid = _inspectionid;
@@ -139,6 +140,14 @@ public class Inspection implements Parcelable {
 
     public void setPhotoCo(int photoCo) {
         this.photoCo = photoCo;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 
 

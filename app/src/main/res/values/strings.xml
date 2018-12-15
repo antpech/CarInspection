@@ -9,7 +9,7 @@
     <string name="action_takephoto">Добавить фотографию</string>
     <string name="action_searchorder">Найти заказ-наряд</string>
     <string name="btnSync">Загрузить в основную базу</string>
-    <string name="OrderNumber">Номер заказ-наряда</string>
+    <string name="OrderNumber">Номер</string>
     <string name="OrderDate">Дата заказ-наряда</string>
     <string name="VIN">VIN</string>
     <string name="ModelName">Модель</string>

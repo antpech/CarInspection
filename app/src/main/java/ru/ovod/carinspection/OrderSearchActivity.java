@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -36,6 +37,8 @@ public class OrderSearchActivity extends AppCompatActivity {
         Intent intent = getIntent();
         inspectionID = intent.getIntExtra("inspectionID", 0);
         inspection = sysHelper.getDbhelper().getInspection(inspectionID);
+
+        ((ProgressBar) findViewById(R.id.progressBar)).setVisibility(ProgressBar.INVISIBLE);
 
         adapter = new OrderSearchAdapter(OrderSearchActivity.this);
         final ListView items = (ListView) findViewById(R.id.items);
@@ -82,6 +85,8 @@ public class OrderSearchActivity extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(String... arg0) {
+            ((ProgressBar) findViewById(R.id.progressBar)).setVisibility(ProgressBar.VISIBLE);
+
             Order order;
             orderList = new ArrayList<Order>();
 
@@ -114,6 +119,8 @@ public class OrderSearchActivity extends AppCompatActivity {
             for (Order item: orderList) {
                 adapter.add(item);
             }
+
+            ((ProgressBar) findViewById(R.id.progressBar)).setVisibility(ProgressBar.INVISIBLE);
         }
     }
 }

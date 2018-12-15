@@ -22,6 +22,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
@@ -82,12 +83,28 @@ public class AddCarInspectionActivity extends AppCompatActivity {
         int inspectionID = intent.getIntExtra("inspectionID", 0);
         inspection = sysHelper.getDbhelper().getInspection(inspectionID);
 
-        RecyclerView recyclerView = (RecyclerView)findViewById(R.id.imageGallery);
+        final RecyclerView recyclerView = (RecyclerView)findViewById(R.id.imageGallery);
         recyclerView.setHasFixedSize(true);
         layoutManager = new GridLayoutManager(getApplicationContext(),2);
         recyclerView.setLayoutManager(layoutManager);
 
         adapter = new AddCarInspectionAdapter();
+        adapter.setOnClickListener(
+                new AddCarInspectionAdapter.DetailsAdapterListener() {
+                    @Override
+                    public void fabOnClick(View v, int position) {
+                       Photo photo = adapter.getItem(position);
+                       File file = new File(photo.getPath());
+                       boolean deleted = file.delete();
+                       if (deleted) {
+                           deleted = sysHelper.getDbhelper().delPhoto(photo.get_photoid());
+                           if (deleted) {
+                               adapter.del(position);
+                           }
+                       }
+                    }
+                }
+        );
         recyclerView.setAdapter(adapter);
 
         setControls();

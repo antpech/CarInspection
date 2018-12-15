@@ -1,6 +1,7 @@
 package ru.ovod.carinspection.adapters;
 
 import android.content.Context;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -8,11 +9,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
+import java.io.File;
 import java.text.SimpleDateFormat;
 
 import ru.ovod.carinspection.R;
+import ru.ovod.carinspection.helpers.SysHelper;
 import ru.ovod.carinspection.pojo.Inspection;
 
 
@@ -26,6 +32,7 @@ public class CarInspectionAdapter extends ArrayAdapter<Inspection> {
         TextView model;
         TextView vin;
         CheckBox isSynced;
+        ImageView img;
     }
 
     public CarInspectionAdapter(Context context) {
@@ -50,6 +57,7 @@ public class CarInspectionAdapter extends ArrayAdapter<Inspection> {
             viewHolder.model = (TextView) convertView.findViewById(R.id.viewModel);
             viewHolder.vin = (TextView) convertView.findViewById(R.id.viewVIN);
             viewHolder.isSynced = (CheckBox) convertView.findViewById(R.id.chbIsSynced);
+            viewHolder.img = (ImageView) convertView.findViewById(R.id.img);
             // store the holder with the view.
             convertView.setTag(viewHolder);
         }else{
@@ -74,6 +82,16 @@ public class CarInspectionAdapter extends ArrayAdapter<Inspection> {
             viewHolder.model.setText(item.getModel());
             viewHolder.vin.setText(item.getVin());
             viewHolder.isSynced.setChecked(item.getIssync() == 1);
+
+            if (item.getPath() != null) {
+                File file = new File(item.getPath());
+                Uri photoURI = SysHelper.getInstance(null).getUri(file);
+                Picasso.get()
+                        .load(photoURI)
+                        .resize(100, 100)
+                        //.rotate(angle)
+                        .into(viewHolder.img);
+            }
 
             convertView.setTag(viewHolder);
         }

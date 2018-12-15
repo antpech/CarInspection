@@ -22,6 +22,7 @@ import ru.ovod.carinspection.pojo.Photo;
 public class AddCarInspectionAdapter extends RecyclerView.Adapter<AddCarInspectionAdapter.ViewHolder> {
     private ArrayList<Photo> galleryList;
     private boolean isDelVisible;
+    public DetailsAdapterListener onClickListener;
 
     public AddCarInspectionAdapter() {
         this.galleryList = new ArrayList<Photo>();
@@ -35,6 +36,11 @@ public class AddCarInspectionAdapter extends RecyclerView.Adapter<AddCarInspecti
 
     public void add(Photo photo) {
         galleryList.add(photo);
+        notifyDataSetChanged();
+    }
+
+    public void del(int position){
+        galleryList.remove(position);
         notifyDataSetChanged();
     }
 
@@ -54,19 +60,19 @@ public class AddCarInspectionAdapter extends RecyclerView.Adapter<AddCarInspecti
     }
 
     @Override
-    public void onBindViewHolder(AddCarInspectionAdapter.ViewHolder viewHolder, int i) {
+    public void onBindViewHolder(AddCarInspectionAdapter.ViewHolder viewHolder, final int i) {
         //viewHolder.title.setText(galleryList.get(i).getName());
         viewHolder.img.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
         File file = new File(galleryList.get(i).getPath());
         Uri photoURI = SysHelper.getInstance(null).getUri(file);
 
-        float angle = new PhotoHelper().getRotateAngle(galleryList.get(i).getPath());
+        //float angle = new PhotoHelper().getRotateAngle(galleryList.get(i).getPath());
 
         Picasso.get()
                 .load(photoURI)
-                .resize(400, 400)
-                .rotate(angle)
+                .resize(200, 200)
+                //.rotate(angle)
                 .into(viewHolder.img);
 
         if (isDelVisible) {
@@ -80,11 +86,24 @@ public class AddCarInspectionAdapter extends RecyclerView.Adapter<AddCarInspecti
         } else {
             viewHolder.imgSynced.setVisibility(View.VISIBLE);
         }
+
+        viewHolder.fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onClickListener.fabOnClick(v, i);
+            }
+        });
+
+
     }
 
     @Override
     public int getItemCount() {
         return galleryList.size();
+    }
+
+    public Photo getItem(int position) {
+        return galleryList.get(position);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{
@@ -100,5 +119,14 @@ public class AddCarInspectionAdapter extends RecyclerView.Adapter<AddCarInspecti
             img = (ImageView) view.findViewById(R.id.img);
             imgSynced = (ImageView) view.findViewById(R.id.imgSynced);
         }
+    }
+
+    public interface DetailsAdapterListener {
+
+        void fabOnClick(View v, int position);
+    }
+
+    public void setOnClickListener(DetailsAdapterListener onClickListener) {
+        this.onClickListener = onClickListener;
     }
 }

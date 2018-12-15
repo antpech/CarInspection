@@ -6,6 +6,7 @@ import java.io.IOException;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.ImageFormat;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -31,6 +32,10 @@ public class CameraCaptureActivity extends AppCompatActivity implements SurfaceH
     private SysHelper sysHelper;
     private Inspection inspection;
     private int cameraId;
+    private boolean cameraConfigured=false;
+    private int angle;
+
+    private static String TAG = "CameraCaptureActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,17 +64,10 @@ public class CameraCaptureActivity extends AppCompatActivity implements SurfaceH
     }
 
     private void openCamera(){
-        try {
-            cameraId = getCameraId();
-            mCamera = Camera.open(cameraId);
-            mCamera.getParameters();
-            mCamera.setPreviewDisplay(surfaceHolder);
-            setCameraDisplayOrientation((Activity)this, cameraId, mCamera);
-            mCamera.startPreview();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        cameraId = getCameraId();
+        mCamera = Camera.open(cameraId);
+        angle = setCameraDisplayOrientation((Activity)this, cameraId, mCamera);
+        mCamera.startPreview();
     }
 
     private int getCameraId(){
@@ -113,7 +111,7 @@ public class CameraCaptureActivity extends AppCompatActivity implements SurfaceH
                 try {
                     sysHelper.getPhotoHelper().createImageFile(context, "Order", inspection.getNumber());
                 } catch (Exception e) {
-                    Log.e("createImageFile ERROR:", "unhandled error");
+                    Log.e(TAG, "createImageFile unhandled error");
                 }
 
                 String PATH = sysHelper.getPhotoHelper().getmCurrentPhotoPath();
@@ -143,24 +141,20 @@ public class CameraCaptureActivity extends AppCompatActivity implements SurfaceH
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width,
                                int height) {
-        Log.e("Surface Changed", "format   ==   " + format + ",   width  ===  "
+        Log.e(TAG, "Surface Changed, format   ==   " + format + ",   width  ===  "
                 + width + ", height   ===    " + height);
-        try {
-            mCamera.setPreviewDisplay(holder);
-            mCamera.startPreview();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        initPreview(holder, width, height, angle);
+        mCamera.startPreview();
     }
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        Log.e("Surface Created", "");
+        Log.e(TAG, "Surface Created");
     }
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-        Log.e("Surface Destroyed", "");
+        Log.e(TAG, "Surface Destroyed");
     }
 
     @Override
@@ -182,7 +176,79 @@ public class CameraCaptureActivity extends AppCompatActivity implements SurfaceH
         }
     }
 
-    public static void setCameraDisplayOrientation(Activity activity,
+    private void initPreview(SurfaceHolder holder, int width, int height, int angle) {
+        if (mCamera != null && holder.getSurface() != null) {
+            try {
+                mCamera.setPreviewDisplay(holder);
+            }
+            catch (Throwable t) {
+                Log.e(TAG,
+                        "Exception in setPreviewDisplay()", t);
+                sysHelper.showToAst(t.getMessage());
+            }
+
+            if (!cameraConfigured) {
+                Camera.Parameters parameters=mCamera.getParameters();
+                Camera.Size size=getBestPreviewSize(width, height, parameters);
+                Camera.Size pictureSize=getLargestPictureSize(parameters);
+
+                if (size != null && pictureSize != null) {
+                    parameters.setPreviewSize(size.width, size.height);
+                    parameters.setPictureSize(pictureSize.width,
+                            pictureSize.height);
+                    parameters.setPictureFormat(ImageFormat.JPEG);
+                    parameters.setRotation(angle);
+                    mCamera.setParameters(parameters);
+                    cameraConfigured=true;
+                }
+            }
+        }
+    }
+
+    private Camera.Size getBestPreviewSize(int width, int height,
+                                           Camera.Parameters parameters) {
+        Camera.Size result=null;
+
+        for (Camera.Size size : parameters.getSupportedPreviewSizes()) {
+            if (size.width <= width && size.height <= height) {
+                if (result == null) {
+                    result=size;
+                }
+                else {
+                    int resultArea=result.width * result.height;
+                    int newArea=size.width * size.height;
+
+                    if (newArea > resultArea) {
+                        result=size;
+                    }
+                }
+            }
+        }
+
+        return(result);
+    }
+
+    private Camera.Size getLargestPictureSize(Camera.Parameters parameters) {
+        Camera.Size result=null;
+
+        for (Camera.Size size : parameters.getSupportedPictureSizes()) {
+            if (result == null) {
+                result=size;
+            }
+            else {
+                int resultArea=result.width * result.height;
+                int newArea=size.width * size.height;
+
+                if (newArea > resultArea) {
+                    result=size;
+                }
+            }
+        }
+
+        return(result);
+    }
+
+    private static int setCameraDisplayOrientation(Activity activity,
                                                    int cameraId, android.hardware.Camera camera) {
 
         android.hardware.Camera.CameraInfo info =
@@ -208,5 +274,7 @@ public class CameraCaptureActivity extends AppCompatActivity implements SurfaceH
             result = (info.orientation - degrees + 360) % 360;
         }
         camera.setDisplayOrientation(result);
+
+        return result;
     }
 }
