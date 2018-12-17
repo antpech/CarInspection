@@ -345,6 +345,7 @@ public class AddCarInspectionActivity extends AppCompatActivity {
         // обработаем получение фото
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
             (new RefreshList()).execute();
+
             // запишем информацию о фото в базу
             /*
             Photo photo = new Photo(0

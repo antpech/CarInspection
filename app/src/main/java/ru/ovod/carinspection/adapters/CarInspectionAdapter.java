@@ -18,6 +18,7 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 
 import ru.ovod.carinspection.R;
+import ru.ovod.carinspection.helpers.PhotoHelper;
 import ru.ovod.carinspection.helpers.SysHelper;
 import ru.ovod.carinspection.pojo.Inspection;
 
@@ -84,12 +85,14 @@ public class CarInspectionAdapter extends ArrayAdapter<Inspection> {
             viewHolder.isSynced.setChecked(item.getIssync() == 1);
 
             if (item.getPath() != null) {
+                float angle = new PhotoHelper().getRotateAngle(item.getPath());
+
                 File file = new File(item.getPath());
                 Uri photoURI = SysHelper.getInstance(null).getUri(file);
                 Picasso.get()
                         .load(photoURI)
                         .resize(100, 100)
-                        //.rotate(angle)
+                        .rotate(angle)
                         .into(viewHolder.img);
             }
 

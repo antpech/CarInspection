@@ -2,12 +2,16 @@ package ru.ovod.carinspection;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.ImageFormat;
 import android.hardware.Camera;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -67,6 +71,7 @@ public class CameraCaptureActivity extends AppCompatActivity implements SurfaceH
         cameraId = getCameraId();
         mCamera = Camera.open(cameraId);
         angle = setCameraDisplayOrientation((Activity)this, cameraId, mCamera);
+        initPreview(surfaceHolder, surfaceView.getWidth(), surfaceView.getHeight(), angle);
         mCamera.startPreview();
     }
 
@@ -103,6 +108,11 @@ public class CameraCaptureActivity extends AppCompatActivity implements SurfaceH
     }
 
     private void capture() {
+        angle = setCameraDisplayOrientation(this, cameraId, mCamera);
+        Camera.Parameters parameters=mCamera.getParameters();
+        parameters.setRotation(angle);
+        mCamera.setParameters(parameters);
+
         mCamera.takePicture(null, null, null, new Camera.PictureCallback() {
 
             @Override
@@ -193,9 +203,23 @@ public class CameraCaptureActivity extends AppCompatActivity implements SurfaceH
                 Camera.Size pictureSize=getLargestPictureSize(parameters);
 
                 if (size != null && pictureSize != null) {
+                    parameters.setSceneMode(mCamera.getParameters().SCENE_MODE_HDR);
+                    parameters.setJpegThumbnailSize(400,400);
+                    parameters.set("anti-shake", 1);
+
+
+                    List<String> SceneModes = mCamera.getParameters().getSupportedSceneModes();
+                    for (String mode: SceneModes){
+                        if (mode == mCamera.getParameters().SCENE_MODE_STEADYPHOTO){
+                            parameters.setSceneMode(mCamera.getParameters().SCENE_MODE_STEADYPHOTO);
+                            break;
+                        }
+                    }
+
                     parameters.setPreviewSize(size.width, size.height);
                     parameters.setPictureSize(pictureSize.width,
                             pictureSize.height);
+
                     parameters.setPictureFormat(ImageFormat.JPEG);
                     parameters.setRotation(angle);
                     mCamera.setParameters(parameters);
