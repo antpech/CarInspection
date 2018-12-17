@@ -1,26 +1,27 @@
 package ru.ovod.carinspection;
 
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.List;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.graphics.ImageFormat;
 import android.hardware.Camera;
 import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Display;
 import android.view.MenuItem;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import android.widget.Button;
 
 import ru.ovod.carinspection.helpers.SysHelper;
 import ru.ovod.carinspection.pojo.Inspection;
@@ -31,13 +32,21 @@ public class CameraCaptureActivity extends AppCompatActivity implements SurfaceH
     private Camera mCamera;
     private SurfaceView surfaceView;
     private SurfaceHolder surfaceHolder;
-    private Button capture_image;
+    private FloatingActionButton capture_image;
 
     private SysHelper sysHelper;
     private Inspection inspection;
     private int cameraId;
     private boolean cameraConfigured=false;
     private int angle;
+
+    /*
+    private SensorManager sensorManager;
+    private Sensor orientationSensor;
+    private static final int GENERAL_ORIENTATION_UNCHANGED = 999;
+    private int lastOrientation;
+    */
+    private int lastGeneralOrientation = -1;
 
     private static String TAG = "CameraCaptureActivity";
 
@@ -50,8 +59,10 @@ public class CameraCaptureActivity extends AppCompatActivity implements SurfaceH
         Intent intent = getIntent();
         inspection = intent.getParcelableExtra("Inspection");
 
+        //sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        //orientationSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
-        capture_image = (Button) findViewById(R.id.capture_image);
+        capture_image = (FloatingActionButton) findViewById(R.id.capture_image);
         capture_image.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -109,6 +120,7 @@ public class CameraCaptureActivity extends AppCompatActivity implements SurfaceH
 
     private void capture() {
         angle = setCameraDisplayOrientation(this, cameraId, mCamera);
+
         Camera.Parameters parameters=mCamera.getParameters();
         parameters.setRotation(angle);
         mCamera.setParameters(parameters);
@@ -176,6 +188,8 @@ public class CameraCaptureActivity extends AppCompatActivity implements SurfaceH
             mCamera = null;
         }
 
+        //if(sensorManager != null) sensorManager.unregisterListener(this);
+
     }
 
     @Override
@@ -184,6 +198,7 @@ public class CameraCaptureActivity extends AppCompatActivity implements SurfaceH
         if (mCamera == null) {
             openCamera();
         }
+        //if(sensorManager != null) sensorManager.registerListener(this, orientationSensor, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     private void initPreview(SurfaceHolder holder, int width, int height, int angle) {
@@ -203,11 +218,11 @@ public class CameraCaptureActivity extends AppCompatActivity implements SurfaceH
                 Camera.Size pictureSize=getLargestPictureSize(parameters);
 
                 if (size != null && pictureSize != null) {
-                    parameters.setSceneMode(mCamera.getParameters().SCENE_MODE_HDR);
                     parameters.setJpegThumbnailSize(400,400);
                     parameters.set("anti-shake", 1);
 
 
+                    parameters.setSceneMode(mCamera.getParameters().SCENE_MODE_AUTO);
                     List<String> SceneModes = mCamera.getParameters().getSupportedSceneModes();
                     for (String mode: SceneModes){
                         if (mode == mCamera.getParameters().SCENE_MODE_STEADYPHOTO){
@@ -272,7 +287,7 @@ public class CameraCaptureActivity extends AppCompatActivity implements SurfaceH
         return(result);
     }
 
-    private static int setCameraDisplayOrientation(Activity activity,
+    private int setCameraDisplayOrientation(Activity activity,
                                                    int cameraId, android.hardware.Camera camera) {
 
         android.hardware.Camera.CameraInfo info =
@@ -280,14 +295,18 @@ public class CameraCaptureActivity extends AppCompatActivity implements SurfaceH
 
         android.hardware.Camera.getCameraInfo(cameraId, info);
 
-        int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
+        int rotation;
         int degrees = 0;
-
-        switch (rotation) {
-            case Surface.ROTATION_0: degrees = 0; break;
-            case Surface.ROTATION_90: degrees = 90; break;
-            case Surface.ROTATION_180: degrees = 180; break;
-            case Surface.ROTATION_270: degrees = 270; break;
+        if (lastGeneralOrientation != -1){
+            degrees = lastGeneralOrientation;
+        } else {
+            rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
+            switch (rotation) {
+                case Surface.ROTATION_0: degrees = 0; break;
+                case Surface.ROTATION_90: degrees = 90; break;
+                case Surface.ROTATION_180: degrees = 180; break;
+                case Surface.ROTATION_270: degrees = 270; break;
+            }
         }
 
         int result;
@@ -301,4 +320,72 @@ public class CameraCaptureActivity extends AppCompatActivity implements SurfaceH
 
         return result;
     }
+
+    /*
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+
+        int ORIENTATION_UNKNOWN = -1;
+        int _DATA_X = 0;
+        int _DATA_Y = 1;
+        int _DATA_Z = 2;
+
+        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            float[] values = event.values;
+            int orientation = ORIENTATION_UNKNOWN;
+            float X = -values[_DATA_X];
+            float Y = -values[_DATA_Y];
+            float Z = -values[_DATA_Z];
+            float magnitude = X*X + Y*Y;
+            if (magnitude * 4 >= Z*Z) {
+                float OneEightyOverPi = 57.29577957855f;
+                float angle = (float)Math.atan2(-Y, X) * OneEightyOverPi;
+                orientation = 90 - (int)Math.round(angle);
+                // normalize to 0 - 359 range
+                orientation = compensateOrientation(orientation);
+                while (orientation >= 360) {
+                    orientation -= 360;
+                }
+                while (orientation < 0) {
+                    orientation += 360;
+                }
+            }
+
+            if (orientation != lastOrientation) {
+                lastOrientation = orientation;
+                int generalOrientation = getGeneralOrientation(orientation);
+                if(generalOrientation != GENERAL_ORIENTATION_UNCHANGED && generalOrientation != lastGeneralOrientation){
+                    lastGeneralOrientation = generalOrientation;
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        return;
+    }
+
+    private static int getGeneralOrientation(int degrees){
+        if(degrees >= 330 || degrees <= 30 ) return 0;
+        if(degrees <= 300 && degrees >= 240) return 270;
+        if(degrees <= 210 && degrees >= 160) return 180;
+        if(degrees <= 120 && degrees >= 60) return 90;
+        return GENERAL_ORIENTATION_UNCHANGED;
+    }
+
+    private int compensateOrientation(int degrees){
+        Display display = getWindowManager().getDefaultDisplay();
+        switch(display.getRotation()){
+            case(Surface.ROTATION_270):
+                return degrees + 270;
+            case(Surface.ROTATION_180):
+                return degrees + 180;
+            case(Surface.ROTATION_90):
+                return degrees + 90;
+            default:
+                return degrees;
+        }
+    }
+    */
 }
