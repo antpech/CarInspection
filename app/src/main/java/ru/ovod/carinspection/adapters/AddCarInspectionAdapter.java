@@ -67,12 +67,12 @@ public class AddCarInspectionAdapter extends RecyclerView.Adapter<AddCarInspecti
         File file = new File(galleryList.get(i).getPath());
         Uri photoURI = SysHelper.getInstance(null).getUri(file);
 
-        //float angle = new PhotoHelper().getRotateAngle(galleryList.get(i).getPath());
+        float angle = new PhotoHelper().getRotateAngle(galleryList.get(i).getPath());
 
         Picasso.get()
                 .load(photoURI)
-                .resize(200, 200)
-                //.rotate(angle)
+                .resize(400, 400)
+                .rotate(angle)
                 .into(viewHolder.img);
 
         if (isDelVisible) {
