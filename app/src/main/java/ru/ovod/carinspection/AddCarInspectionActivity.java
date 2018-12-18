@@ -105,7 +105,7 @@ public class AddCarInspectionActivity extends AppCompatActivity {
 
         final RecyclerView recyclerView = (RecyclerView)findViewById(R.id.imageGallery);
         recyclerView.setHasFixedSize(true);
-        layoutManager = new GridLayoutManager(getApplicationContext(),2);
+        layoutManager = new GridLayoutManager(getApplicationContext(),3);
         recyclerView.setLayoutManager(layoutManager);
 
         adapter = new AddCarInspectionAdapter();
@@ -169,7 +169,7 @@ public class AddCarInspectionActivity extends AppCompatActivity {
                 }
 
                 return true;
-
+/*
             case R.id.action_searchorder:
                 if (checkNumberIsSet()) {
                     if (saveInspection()) {
@@ -178,6 +178,7 @@ public class AddCarInspectionActivity extends AppCompatActivity {
                 }
 
                 return true;
+*/
 
             case R.id.action_del_photo:
                 if (item.getTitle() != "Готово") {

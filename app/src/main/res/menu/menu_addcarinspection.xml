@@ -10,11 +10,13 @@
         android:icon="@android:drawable/ic_menu_camera"
         app:showAsAction="always" />
 
+    <!--
     <item
         android:id="@+id/action_searchorder"
         android:title="@string/action_searchorder"
         android:icon="@android:drawable/ic_menu_search"
         app:showAsAction="always" />
+     -->
 
     <item
         android:id="@+id/action_del_photo"

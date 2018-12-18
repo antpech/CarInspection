@@ -4,10 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@android:color/white"
     android:descendantFocusability="blocksDescendants"
     android:layout_margin="@dimen/margin"
     android:orientation="horizontal"
+    android:background="#ff0fff"
+    android:elevation="10dp"
     >
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
@@ -31,22 +32,28 @@
         android:layout_weight="1"
         android:layout_margin="@dimen/margin"
         >
-
-        <TextView
-            android:id="@+id/viewDate"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="@string/OrderDate"
-            android:textSize="10sp" />
+            android:orientation="horizontal"
+            >
 
-        <TextView
-            android:id="@+id/viewNumber"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:hint="@string/OrderNumber"
-            android:textStyle="bold"
-            android:textSize="24sp"
-            />
+            <TextView
+                android:id="@+id/viewNumber"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="@string/OrderNumber"
+                android:textStyle="bold"
+                android:textSize="24sp"
+                />
+
+            <TextView
+                android:id="@+id/viewDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="@string/OrderDate"
+                android:textSize="12sp" />
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -88,7 +95,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:hint="@string/PhotoCo"
-            android:textSize="10sp" />
+            android:textSize="12sp" />
     </LinearLayout>
 
 </LinearLayout>

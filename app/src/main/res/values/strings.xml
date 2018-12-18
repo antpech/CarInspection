@@ -8,7 +8,7 @@
     <string name="action_add_carinspection">Добавить осмотр АМ</string>
     <string name="action_takephoto">Добавить фотографию</string>
     <string name="action_searchorder">Найти заказ-наряд</string>
-    <string name="btnSync">Загрузить в основную базу</string>
+    <string name="btnSync">Загрузить</string>
     <string name="OrderNumber">Номер</string>
     <string name="OrderDate">Дата заказ-наряда</string>
     <string name="VIN">VIN</string>
