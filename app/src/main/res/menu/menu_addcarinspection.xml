@@ -18,7 +18,7 @@
 
     <item
         android:id="@+id/action_del_photo"
-        android:title="@string/action_del_photo"
+        android:title="@string/action_edit"
 
         app:showAsAction="always|withText"
         />

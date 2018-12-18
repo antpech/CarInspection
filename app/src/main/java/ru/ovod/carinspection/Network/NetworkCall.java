@@ -1,5 +1,6 @@
 package ru.ovod.carinspection.Network;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.ProgressBar;
@@ -13,6 +14,7 @@ import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import ru.ovod.carinspection.AddCarInspectionActivity;
 import ru.ovod.carinspection.adapters.AddCarInspectionAdapter;
 import ru.ovod.carinspection.helpers.SysHelper;
 import ru.ovod.carinspection.pojo.Inspection;
@@ -37,8 +39,9 @@ public class NetworkCall {
     }
 
 
-    public void fileUpload(final AddCarInspectionAdapter adapter, Inspection inspection, final SysHelper sysHelper) {
-        if (adapter.getGalleryList().isEmpty()) { return; }
+    public void fileUpload(final Context context, Inspection inspection, final SysHelper sysHelper) {
+        final AddCarInspectionActivity activity = (AddCarInspectionActivity) context;
+        if (activity.getAdapter().getGalleryList().isEmpty()) { return; }
 
         final MyInt photoCo = new MyInt();
         File file;
@@ -46,7 +49,7 @@ public class NetworkCall {
         MultipartBody.Part body = null;
         Call<ResponseModel> call = null;
 
-        for (final Photo photo: adapter.getGalleryList()) {
+        for (final Photo photo: activity.getAdapter().getGalleryList()) {
             if (photo.getIssync() == 1) { continue; }
             photoCo.setCo(photoCo.getCo()+1);
         }
@@ -62,7 +65,7 @@ public class NetworkCall {
             RequestBody description = RequestBody.create(MultipartBody.FORM, patientData);
             Log.e("JSON toSend:", patientData);
 
-            for (final Photo photo : adapter.getGalleryList()) {
+            for (final Photo photo : activity.getAdapter().getGalleryList()) {
                 if (photo.getIssync() == 1) {
                     continue;
                 }
@@ -81,9 +84,12 @@ public class NetworkCall {
                             photo.setIssync(1);
                             photoCo.setCo(photoCo.getCo() - 1);
                             if (photoCo.getCo() == 0) {
-                                adapter.notifyDataSetChanged();
                                 sysHelper.getProgressBar().setVisibility(ProgressBar.INVISIBLE);
                                 sysHelper.showToAst("Все фотографии загружены");
+                                if ((context != null) && (activity != null)) {
+                                    activity.getBtnSync().setEnabled(true);
+                                    activity.getAdapter().notifyDataSetChanged();
+                                }
                             }
                         } else
                             Log.e("JSON toSend:", responseModel.getMessage());

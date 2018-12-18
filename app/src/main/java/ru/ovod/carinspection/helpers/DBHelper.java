@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -376,11 +377,40 @@ public class DBHelper extends SQLiteOpenHelper {
 
     }
 
-    public boolean delPhoto(int photoId) {
-        boolean result;
+    public boolean delPhoto(Photo photo) {
+        boolean result = false;
+        File file = new File(photo.getPath());
+        result = file.delete();
+
+        if (result) {
+            SQLiteDatabase database = this.getWritableDatabase();
+            result = database.delete(PHOTO, PHOTO_ID + "=" + String.valueOf(photo.get_photoid()), null) > 0;
+            database.close();
+        }
+
+        return result;
+    }
+
+    public boolean delInspection(Inspection item) {
+        boolean result = false;
+        ArrayList<Photo> photoList = getPhotoList(item.get_inspectionid());
+        for (Photo photo: photoList){
+            File file = new File(photo.getPath());
+            file.delete();
+        }
+
         SQLiteDatabase database = this.getWritableDatabase();
-        result = database.delete(PHOTO, PHOTO_ID + "=" + String.valueOf(photoId), null) > 0;
-        database.close();
+        try {
+            database.beginTransaction();
+            database.delete(PHOTO,  PHOTO_INSPECTION + "=" + String.valueOf(item.get_inspectionid()), null);
+            database.delete(INSPECTION, INSPECTION_ID+ "=" + String.valueOf(item.get_inspectionid()), null);
+            database.setTransactionSuccessful();
+            result = true;
+        } finally {
+            database.endTransaction();
+        }
+
+
         return result;
     }
 }

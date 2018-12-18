@@ -20,9 +20,8 @@ tools:context=".CarInspectionsActivity">
         />
     <item
         android:id="@+id/action_del_carinspection"
-        android:title="@string/action_del_carinspection"
-        android:icon="@android:drawable/ic_menu_delete"
-        app:showAsAction="never"
+        android:title="@string/action_edit"
+        app:showAsAction="always|withText"
         />
 
 

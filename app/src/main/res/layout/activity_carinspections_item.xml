@@ -9,6 +9,13 @@
     android:layout_margin="@dimen/margin"
     android:orientation="horizontal"
     >
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/red"
+        app:fabSize="mini"
+        app:srcCompat="@android:drawable/presence_busy" />
 
     <ImageView
         android:id="@+id/img"

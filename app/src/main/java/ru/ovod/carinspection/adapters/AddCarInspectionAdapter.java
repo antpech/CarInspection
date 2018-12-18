@@ -1,5 +1,6 @@
 package ru.ovod.carinspection.adapters;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.RecyclerView;
@@ -65,7 +66,7 @@ public class AddCarInspectionAdapter extends RecyclerView.Adapter<AddCarInspecti
         viewHolder.img.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
         File file = new File(galleryList.get(i).getPath());
-        Uri photoURI = SysHelper.getInstance(null).getUri(file);
+        final Uri photoURI = SysHelper.getInstance(null).getUri(file);
 
         float angle = new PhotoHelper().getRotateAngle(galleryList.get(i).getPath());
 
@@ -91,6 +92,13 @@ public class AddCarInspectionAdapter extends RecyclerView.Adapter<AddCarInspecti
             @Override
             public void onClick(View v) {
                 onClickListener.fabOnClick(v, i);
+            }
+        });
+
+        viewHolder.img.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                onClickListener.imgOnClick(photoURI);
             }
         });
 
@@ -124,6 +132,7 @@ public class AddCarInspectionAdapter extends RecyclerView.Adapter<AddCarInspecti
     public interface DetailsAdapterListener {
 
         void fabOnClick(View v, int position);
+        void imgOnClick(Uri uri);
     }
 
     public void setOnClickListener(DetailsAdapterListener onClickListener) {

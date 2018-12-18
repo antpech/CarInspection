@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -94,14 +95,19 @@ public class AddCarInspectionActivity extends AppCompatActivity {
                     @Override
                     public void fabOnClick(View v, int position) {
                        Photo photo = adapter.getItem(position);
-                       File file = new File(photo.getPath());
-                       boolean deleted = file.delete();
+                       boolean deleted = sysHelper.getDbhelper().delPhoto(photo);
                        if (deleted) {
-                           deleted = sysHelper.getDbhelper().delPhoto(photo.get_photoid());
-                           if (deleted) {
-                               adapter.del(position);
-                           }
+                           adapter.del(position);
                        }
+                    }
+
+                    @Override
+                    public void imgOnClick(Uri uri){
+                        Intent intent = new Intent();
+                        intent.setAction(Intent.ACTION_VIEW);
+                        intent.setDataAndType(uri, "image/jpeg");
+                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        startActivity(intent);
                     }
                 }
         );
@@ -109,6 +115,14 @@ public class AddCarInspectionActivity extends AppCompatActivity {
 
         setControls();
         new RefreshList().execute();
+    }
+
+    public AddCarInspectionAdapter getAdapter() {
+        return adapter;
+    }
+
+    public Button getBtnSync() {
+        return btnSync;
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -151,7 +165,7 @@ public class AddCarInspectionActivity extends AppCompatActivity {
                     item.setTitle("Готово");
                     adapter.showDelBtn(true);
                 } else {
-                    item.setTitle(R.string.action_del_photo);
+                    item.setTitle(R.string.action_edit);
                     adapter.showDelBtn(false);
                 }
         }
@@ -313,7 +327,8 @@ public class AddCarInspectionActivity extends AppCompatActivity {
         }
 
         if (inspection.getOrderid() > 0) {
-            (new NetworkCall()).fileUpload(adapter, inspection, sysHelper);
+            btnSync.setEnabled(false);
+            (new NetworkCall()).fileUpload(this, inspection, sysHelper);
         }
     }
 

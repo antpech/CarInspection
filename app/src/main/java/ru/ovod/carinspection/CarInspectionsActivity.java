@@ -85,6 +85,14 @@ public class CarInspectionsActivity extends AppCompatActivity {
             case R.id.action_add_carinspection:
                 startAddCarInspectionActivity(0);
                 return true;
+            case R.id.action_del_carinspection:
+                if (item.getTitle() != "Готово") {
+                    item.setTitle("Готово");
+                    adapter.showDelBtn(true);
+                } else {
+                    item.setTitle(R.string.action_edit);
+                    adapter.showDelBtn(false);
+                }
         }
 
         return super.onOptionsItemSelected(item);
@@ -113,6 +121,10 @@ public class CarInspectionsActivity extends AppCompatActivity {
                 adapter.add(item);
             }
         }
+    }
+
+    public boolean delInspection(Inspection item){
+        return sysHelper.getDbhelper().delInspection(item);
     }
 
 
