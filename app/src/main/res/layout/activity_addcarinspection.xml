@@ -16,7 +16,6 @@
         android:layout_width="match_parent"
         android:layout_height="64dp"
         android:orientation="horizontal"
-        android:background="@color/colorBackground"
         >
 
         <EditText
@@ -27,6 +26,7 @@
             android:hint="@string/OrderNumber"
             android:importantForAutofill="no"
             android:inputType="number"
+            android:imeOptions="actionDone"
             tools:targetApi="o" />
 
     </LinearLayout>
@@ -94,15 +94,29 @@
 
         />
 
-    <Button
-        android:id="@+id/btnSync"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/big_text"
-        android:layout_marginEnd="@dimen/big_text"
-        android:layout_marginBottom="@dimen/padding_small"
-        android:text="@string/btnSync"
-        android:drawableStart="@android:drawable/ic_menu_upload"
-        android:background="@color/gray"
-        />
+        android:layout_height="72dp"
+        android:orientation="horizontal"
+        android:layout_marginBottom="8dp"
+        >
+        <Button
+            android:id="@+id/btnTakePhoto"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Сделать фото"
+            android:drawableTop="@android:drawable/ic_menu_camera"
+            android:background="@color/orange"
+            />
+        <Button
+            android:id="@+id/btnSync"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@string/btnSync"
+            android:drawableTop="@android:drawable/ic_menu_upload"
+            android:background="@color/green"
+            />
+    </LinearLayout>
 </LinearLayout>

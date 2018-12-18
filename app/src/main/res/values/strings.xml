@@ -19,5 +19,5 @@
     <string name="WifiIsOffline">Нет подключения wifi</string>
     <string name="ErrorNumberChange">Нельзя изменить номер заказ-наряда. Заказ-наряд был загружен в базу</string>
     <string name="action_search">Поиск осмотра</string>
-    <string name="action_edit">Изменить</string>
+    <string name="action_edit">Удалить</string>
 </resources>

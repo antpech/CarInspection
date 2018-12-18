@@ -2,6 +2,7 @@ package ru.ovod.carinspection;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -15,9 +16,12 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -29,6 +33,7 @@ import java.util.ArrayList;
 
 import ru.ovod.carinspection.Network.NetworkCall;
 import ru.ovod.carinspection.adapters.AddCarInspectionAdapter;
+import ru.ovod.carinspection.helpers.DataSet;
 import ru.ovod.carinspection.helpers.SysHelper;
 import ru.ovod.carinspection.pojo.Inspection;
 import ru.ovod.carinspection.pojo.Order;
@@ -47,6 +52,7 @@ public class AddCarInspectionActivity extends AppCompatActivity {
     private TextView viewVIN;
     private RecyclerView.LayoutManager layoutManager;
     private Button btnSync;
+    private Button btnTakePhoto;
 
 
     /*для фото*/
@@ -63,13 +69,26 @@ public class AddCarInspectionActivity extends AppCompatActivity {
         sysHelper = SysHelper.getInstance(this);
 
         editNumber = findViewById(R.id.editNumber);
+        editNumber.setOnEditorActionListener(new DoneOnEditorActionListener());
         viewDate = findViewById(R.id.viewDate);
         viewModel = findViewById(R.id.viewModel);
         viewVIN = findViewById(R.id.viewVIN);
         btnSync = findViewById(R.id.btnSync);
+        btnTakePhoto = findViewById(R.id.btnTakePhoto);
 
         sysHelper.setProgressBar((ProgressBar) findViewById(R.id.progressBar));
         sysHelper.getProgressBar().setVisibility(ProgressBar.INVISIBLE);
+
+        btnTakePhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (checkNumberIsSet()) {
+                    if (saveInspection()) {
+                        takePhoto((Activity) sysHelper.getApplicationContext());
+                    }
+                }
+            }
+        });
 
         //событие на клик
         btnSync.setOnClickListener(new View.OnClickListener() {
@@ -177,8 +196,8 @@ public class AddCarInspectionActivity extends AppCompatActivity {
                 || ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ) {
             ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 110);
         } else {
-            takePhoto2();
-            //sysHelper.getPhotoHelper().takePhoto(this, PREFIX, inspection.getNumber());
+            //takePhoto2();
+            sysHelper.getPhotoHelper().takePhoto(this, PREFIX, inspection.getNumber());
         }
 
     }
@@ -250,6 +269,7 @@ public class AddCarInspectionActivity extends AppCompatActivity {
             number = Integer.parseInt(editNumber.getText().toString());
         } catch(Exception e) {
             number = 0;
+            result = false;
         }
 
 
@@ -300,7 +320,12 @@ public class AddCarInspectionActivity extends AppCompatActivity {
 
     private boolean checkNumberIsSet() {
         boolean result = false;
-        int number = Integer.parseInt(editNumber.getText().toString());
+        int number;
+        try {
+            number = Integer.parseInt(editNumber.getText().toString());
+        } catch (Exception e) {
+            number = 0;
+        }
         if (number <= 0) {
             sysHelper.showToAst(getString(R.string.SetOrderNumber));
             result = false;
@@ -324,11 +349,9 @@ public class AddCarInspectionActivity extends AppCompatActivity {
 
         if (inspection.getOrderid() <= 0) {
             searchOrder(this);
-        }
-
-        if (inspection.getOrderid() > 0) {
-            btnSync.setEnabled(false);
-            (new NetworkCall()).fileUpload(this, inspection, sysHelper);
+        } else {
+                btnSync.setEnabled(false);
+                (new NetworkCall()).fileUpload(this, inspection, sysHelper);
         }
     }
 
@@ -338,8 +361,8 @@ public class AddCarInspectionActivity extends AppCompatActivity {
         if (requestCode == 110) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED
                     && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
-                takePhoto2();
-                //sysHelper.getPhotoHelper().takePhoto(this, PREFIX, inspection.getNumber());
+                //takePhoto2();
+                sysHelper.getPhotoHelper().takePhoto(this, PREFIX, inspection.getNumber());
             }
         }
 
@@ -359,16 +382,15 @@ public class AddCarInspectionActivity extends AppCompatActivity {
 
         // обработаем получение фото
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
-            (new RefreshList()).execute();
+            //(new RefreshList()).execute();
 
             // запишем информацию о фото в базу
-            /*
+
             Photo photo = new Photo(0
                     ,sysHelper.getPhotoHelper().getmCurrentPhotoPath()
                     ,sysHelper.getPhotoHelper().getmCurrentPhotoName(), 0, inspection.get_inspectionid());
             photo = sysHelper.getDbhelper().insPhoto(photo);
             adapter.add(photo);
-            */
         }
 
         // обработаем получение OrderID
@@ -392,6 +414,66 @@ public class AddCarInspectionActivity extends AppCompatActivity {
             ((GridLayoutManager) layoutManager).setSpanCount(4);
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT){
             ((GridLayoutManager) layoutManager).setSpanCount(2);
+        }
+    }
+
+    private class DoneOnEditorActionListener implements TextView.OnEditorActionListener {
+        @Override
+        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                (new searchOrder()).execute();
+
+                InputMethodManager imm = (InputMethodManager)v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                return true;
+            }
+            return false;
+        }
+    }
+
+    private class searchOrder extends AsyncTask<String, Void, Void> {
+        Order order = null;
+
+        @Override
+        protected Void doInBackground(String... arg0) {
+            if (checkNumberIsSet()) {
+                if (saveInspection()) {
+                    if (inspection.getOrderid() <= 0) {
+                        if (sysHelper.isOnline()) {
+                            DataSet dataset = new DataSet();
+                            String sql = "select orderid, number, date, vin, model from TechnicalCentre.dbo.V_ActualOrderForOrderPhotos with(NoLock) ";
+                            if (inspection != null) {
+                                sql += "where number = " + String.valueOf(inspection.getNumber());
+                            }
+                            sql += " order by date ";
+                            dataset.GetJSONFromWEB(sql);
+                            if (dataset.RecordCount() > 0) {
+                                for (int i = 0; i < dataset.RecordCount(); i++) {
+                                    dataset.GetRowByNumber(i);
+                                    order = new Order(
+                                            dataset.FieldByName_AsInteger("orderid"),
+                                            dataset.FieldByName_AsInteger("number"),
+                                            dataset.FieldByName_AsDate("date"),
+                                            dataset.FieldByName_AsString("model"),
+                                            dataset.FieldByName_AsString("vin")
+                                    );
+                                    order.setInspectionID(inspection.get_inspectionid());
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(final Void unused){
+            if (order != null) {
+                inspection = sysHelper.getDbhelper().updInspectionOrder(order);
+                setControls();
+            }
         }
     }
 

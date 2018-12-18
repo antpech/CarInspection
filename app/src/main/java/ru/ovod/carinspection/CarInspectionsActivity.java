@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ import ru.ovod.carinspection.pojo.Inspection;
 public class CarInspectionsActivity extends AppCompatActivity {
     private SysHelper sysHelper;
     private CarInspectionAdapter adapter;
+    private Button btnAdd;
 
     //Создание формы
     @Override
@@ -47,6 +49,14 @@ public class CarInspectionsActivity extends AppCompatActivity {
                     }
                 }
         );
+
+        btnAdd = (Button) findViewById(R.id.btnAdd);
+        btnAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startAddCarInspectionActivity(0);
+            }
+        });
 
         new RefreshList().execute();
     }
