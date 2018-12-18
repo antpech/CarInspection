@@ -1,6 +1,5 @@
 package ru.ovod.carinspection.adapters;
 
-import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.NonNull;

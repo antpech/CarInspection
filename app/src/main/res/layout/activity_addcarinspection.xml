@@ -11,80 +11,98 @@
     android:focusableInTouchMode="true"
     >
 
-
-
-
-    <EditText
-        android:id="@+id/editNumber"
-        android:layout_width="match_parent"
-        android:layout_height="64dp"
-        android:textSize="32sp"
-        android:hint="@string/OrderNumber"
-        android:importantForAutofill="no"
-        android:inputType="number"
-        android:imeOptions="actionDone"
-        tools:targetApi="o" />
-
-
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:indeterminate="true"
-
-        />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
+        android:orientation="vertical"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp"
+        android:layout_marginBottom="4dp"
+        android:elevation="4dp"
+        android:background="@color/colorBackground"
         >
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_weight="1"
+
+
+
+        <EditText
+            android:id="@+id/editNumber"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:textSize="32sp"
+            android:hint="@string/OrderNumber"
+            android:importantForAutofill="no"
+            android:inputType="number"
+            android:imeOptions="actionDone"
+            tools:targetApi="o"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            />
+
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:indeterminate="true"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
 
-            <TextView
-                android:id="@+id/viewDate"
-                android:hint="@string/OrderDate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                />
+            />
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            >
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="8dp"
+                android:orientation="vertical"
                 >
-                <TextView
-                    android:id="@+id/viewVIN"
-                    android:hint="@string/VIN"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
 
                 <TextView
-                    android:id="@+id/viewModel"
-                    android:hint="@string/ModelName"
+                    android:id="@+id/viewDate"
+                    android:hint="@string/OrderDate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"/>
+                    />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="8dp"
+                    >
+                    <TextView
+                        android:id="@+id/viewVIN"
+                        android:hint="@string/VIN"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/viewModel"
+                        android:hint="@string/ModelName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"/>
+
+                </LinearLayout>
 
             </LinearLayout>
 
+            <Button
+                android:id="@+id/btnSync"
+                android:layout_width="150dp"
+                android:layout_height="match_parent"
+                android:drawableStart="@android:drawable/ic_menu_upload"
+                android:text="@string/btnSync"
+                />
+
         </LinearLayout>
-
-        <Button
-            android:id="@+id/btnSync"
-            android:layout_width="150dp"
-            android:layout_height="match_parent"
-            android:drawableStart="@android:drawable/ic_menu_upload"
-            android:text="@string/btnSync" />
-
     </LinearLayout>
 
 
@@ -93,13 +111,17 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:layout_margin="@dimen/padding_small"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="4dp"
         />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="72dp"
         android:orientation="horizontal"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         >
         <Button
@@ -109,6 +131,7 @@
             android:layout_weight="1"
             android:text="Сделать фото"
             android:drawableTop="@android:drawable/ic_menu_camera"
+            android:elevation="4dp"
             />
     </LinearLayout>
 </LinearLayout>

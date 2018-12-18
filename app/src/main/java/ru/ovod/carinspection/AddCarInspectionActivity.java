@@ -14,6 +14,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NavUtils;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
@@ -42,14 +43,14 @@ import ru.ovod.carinspection.pojo.Photo;
 
 
 public class AddCarInspectionActivity extends AppCompatActivity {
-    private SysHelper sysHelper;
-    private AddCarInspectionAdapter adapter;
-    private Inspection inspection;
+    private static SysHelper sysHelper;
+    private static AddCarInspectionAdapter adapter;
+    private static Inspection inspection;
 
-    private EditText editNumber; //поле Edit с номером ЗН. Инициализируется OnCreate.
-    private TextView viewDate;
-    private TextView viewModel;
-    private TextView viewVIN;
+    private static EditText editNumber; //поле Edit с номером ЗН. Инициализируется OnCreate.
+    private static TextView viewDate;
+    private static TextView viewModel;
+    private static TextView viewVIN;
     private RecyclerView.LayoutManager layoutManager;
     private Button btnSync;
     private Button btnTakePhoto;
@@ -84,6 +85,7 @@ public class AddCarInspectionActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (checkNumberIsSet()) {
                     if (saveInspection()) {
+                        setControls();
                         takePhoto((Activity) sysHelper.getApplicationContext());
                     }
                 }
@@ -107,6 +109,13 @@ public class AddCarInspectionActivity extends AppCompatActivity {
         recyclerView.setHasFixedSize(true);
         layoutManager = new GridLayoutManager(getApplicationContext(),3);
         recyclerView.setLayoutManager(layoutManager);
+
+        DividerItemDecoration itemDecorator = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
+        itemDecorator.setDrawable(ContextCompat.getDrawable(this, R.drawable.divider));
+        recyclerView.addItemDecoration(itemDecorator);
+        itemDecorator = new DividerItemDecoration(this, DividerItemDecoration.HORIZONTAL);
+        itemDecorator.setDrawable(ContextCompat.getDrawable(this, R.drawable.divider));
+        recyclerView.addItemDecoration(itemDecorator);
 
         adapter = new AddCarInspectionAdapter();
         adapter.setOnClickListener(
@@ -164,6 +173,7 @@ public class AddCarInspectionActivity extends AppCompatActivity {
             case R.id.action_takephoto:
                 if (checkNumberIsSet()) {
                     if (saveInspection()) {
+                        setControls();
                         takePhoto(this);
                     }
                 }
@@ -173,6 +183,7 @@ public class AddCarInspectionActivity extends AppCompatActivity {
             case R.id.action_searchorder:
                 if (checkNumberIsSet()) {
                     if (saveInspection()) {
+                        setControls();
                         searchOrder(this);
                     }
                 }
@@ -230,11 +241,15 @@ public class AddCarInspectionActivity extends AppCompatActivity {
         return;
     }
 
-    private void setControls() {
+    private static void setControls() {
         if (inspection != null) {
             editNumber.setText(String.valueOf(inspection.getNumber()));
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd.mm.yyyy");
-            if (inspection.getDate().getTime() > 0) { viewDate.setText(dateFormat.format(inspection.getDate())); } else viewDate.setText("");
+            if (inspection.getDate().getTime() > 0) {
+                viewDate.setText(dateFormat.format(inspection.getDate()));
+            } else {
+                viewDate.setText("");
+            }
             viewModel.setText(inspection.getModel());
             viewVIN.setText(inspection.getVin());
         }
@@ -242,7 +257,7 @@ public class AddCarInspectionActivity extends AppCompatActivity {
         return;
     }
 
-    private class RefreshList extends AsyncTask<String, Void, Void> {
+    private static class RefreshList extends AsyncTask<String, Void, Void> {
         ArrayList<Photo> photoList;
 
         @Override
@@ -263,7 +278,7 @@ public class AddCarInspectionActivity extends AppCompatActivity {
         }
     }
 
-    private boolean saveInspection() {
+    private static boolean saveInspection() {
         boolean result = true;
         int number;
         try {
@@ -291,7 +306,7 @@ public class AddCarInspectionActivity extends AppCompatActivity {
                 if (number != inspection.getNumber()) {
                     //если номер изменился, проверим на факт синхронизации
                     if (inspection.getIssync() > 0) {
-                        sysHelper.showToAst(getString(R.string.ErrorNumberChange));
+                        sysHelper.showToAst("Нельзя изменить номер заказ-наряда. Заказ-наряд был загружен в базу.");
                         result = false;
                     } else {
                         Inspection inspection2;
@@ -313,13 +328,12 @@ public class AddCarInspectionActivity extends AppCompatActivity {
                 }
                 //если не изменился, то ничего не делаем
             }
-            setControls();
         }
 
         return result;
     }
 
-    private boolean checkNumberIsSet() {
+    private static boolean checkNumberIsSet() {
         boolean result = false;
         int number;
         try {
@@ -328,7 +342,7 @@ public class AddCarInspectionActivity extends AppCompatActivity {
             number = 0;
         }
         if (number <= 0) {
-            sysHelper.showToAst(getString(R.string.SetOrderNumber));
+            sysHelper.showToAst("Укажите номер заказ-наряда.");
             result = false;
         } else {
             result = true;
@@ -340,7 +354,9 @@ public class AddCarInspectionActivity extends AppCompatActivity {
 
     private void syncData() {
         if (inspection == null) {
-            saveInspection();
+            if (saveInspection()){
+                setControls();
+            }
         }
 
          if (inspection.getNumber() <= 0) {
@@ -432,7 +448,7 @@ public class AddCarInspectionActivity extends AppCompatActivity {
         }
     }
 
-    private class searchOrder extends AsyncTask<String, Void, Void> {
+    private static class searchOrder extends AsyncTask<String, Void, Void> {
         Order order = null;
 
         @Override

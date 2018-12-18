@@ -5,10 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:descendantFocusability="blocksDescendants"
-    android:layout_margin="@dimen/margin"
     android:orientation="horizontal"
-    android:background="#ff0fff"
-    android:elevation="10dp"
+    android:background="#ffffff"
+    android:elevation="4dp"
     >
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"

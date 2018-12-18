@@ -12,12 +12,14 @@
     <ListView
         android:id="@+id/items"
         tools:listitem="@layout/activity_carinspections_item"
-        android:padding="@dimen/padding_small"
-        android:dividerHeight="@dimen/padding_small"
+        android:dividerHeight="4dp"
         android:divider="@android:color/transparent"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="4dp"
         >
     </ListView>
 
@@ -26,6 +28,8 @@
         android:layout_height="72dp"
         android:orientation="horizontal"
         android:layout_marginBottom="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         >
         <Button
             android:id="@+id/btnAdd"
