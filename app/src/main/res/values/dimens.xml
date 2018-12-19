@@ -6,4 +6,5 @@
     <dimen name="big_text">40sp</dimen>
     <dimen name="margin">8dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="photoSize">150dp</dimen>
 </resources>

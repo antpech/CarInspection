@@ -34,7 +34,6 @@
         <activity android:name=".AddCarInspectionActivity"
             android:label="@string/AddCarInspection"
             android:parentActivityName=".CarInspectionsActivity"
-            android:configChanges="orientation|screenSize"
             >
 
 

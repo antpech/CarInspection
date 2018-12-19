@@ -21,6 +21,7 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -117,6 +118,18 @@ public class AddCarInspectionActivity extends AppCompatActivity {
         itemDecorator = new DividerItemDecoration(this, DividerItemDecoration.HORIZONTAL);
         itemDecorator.setDrawable(ContextCompat.getDrawable(this, R.drawable.divider));
         recyclerView.addItemDecoration(itemDecorator);
+        recyclerView.getViewTreeObserver().addOnGlobalLayoutListener(
+                new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+                        recyclerView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                        int viewWidth = recyclerView.getMeasuredWidth();
+                        float cardViewWidth = getResources().getDimension(R.dimen.photoSize);
+                        int newSpanCount = (int) Math.floor(viewWidth / cardViewWidth);
+                        ((GridLayoutManager) layoutManager).setSpanCount(newSpanCount);
+                        layoutManager.requestLayout();
+                    }
+                });
 
         adapter = new AddCarInspectionAdapter();
         adapter.setOnClickListener(
@@ -390,6 +403,8 @@ public class AddCarInspectionActivity extends AppCompatActivity {
                 if (photo.getIssync() == 1) { continue; }
                 count += 1;
             }
+
+            progress.setIndeterminate((count == 1));
         }
 
         @Override
@@ -488,18 +503,6 @@ public class AddCarInspectionActivity extends AppCompatActivity {
                 inspection = sysHelper.getDbhelper().updInspectionOrder(order);
                 setControls();
             }
-        }
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-
-        // Checks the orientation of the screen
-        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            ((GridLayoutManager) layoutManager).setSpanCount(4);
-        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT){
-            ((GridLayoutManager) layoutManager).setSpanCount(3);
         }
     }
 
