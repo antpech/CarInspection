@@ -28,7 +28,6 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
@@ -52,8 +51,9 @@ public class AddCarInspectionActivity extends AppCompatActivity {
     private static TextView viewModel;
     private static TextView viewVIN;
     private RecyclerView.LayoutManager layoutManager;
-    private Button btnSync;
+    private static Button btnSync;
     private Button btnTakePhoto;
+    private static ProgressBar progressBar;
 
 
     /*для фото*/
@@ -76,9 +76,10 @@ public class AddCarInspectionActivity extends AppCompatActivity {
         viewVIN = findViewById(R.id.viewVIN);
         btnSync = findViewById(R.id.btnSync);
         btnTakePhoto = findViewById(R.id.btnTakePhoto);
+        progressBar = findViewById(R.id.progressBar);
 
-        sysHelper.setProgressBar((ProgressBar) findViewById(R.id.progressBar));
-        sysHelper.getProgressBar().setVisibility(ProgressBar.INVISIBLE);
+        progressBar.setVisibility(ProgressBar.INVISIBLE);
+        sysHelper.setProgressBar(progressBar);
 
         btnTakePhoto.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -367,8 +368,77 @@ public class AddCarInspectionActivity extends AppCompatActivity {
         if (inspection.getOrderid() <= 0) {
             searchOrder(this);
         } else {
-                btnSync.setEnabled(false);
-                (new NetworkCall()).fileUpload(this, inspection, sysHelper);
+            (new SyncUpload(progressBar, this, inspection)).execute();
+        }
+
+        return;
+    }
+
+    private static class SyncUpload extends AsyncTask<String, Integer, Void> {
+        ProgressBar progress;
+        Context context;
+        Inspection inspection;
+        int count;
+
+        public SyncUpload(ProgressBar progress, Context context, Inspection inspection) {
+            this.progress = progress;
+            this.context = context;
+            this.inspection = inspection;
+
+            this.count = 0;
+            for (final Photo photo: adapter.getGalleryList()) {
+                if (photo.getIssync() == 1) { continue; }
+                count += 1;
+            }
+        }
+
+        @Override
+        protected void onPreExecute() {
+            progress.setMax(count);
+            progress.setProgress(0);
+            progress.setVisibility(ProgressBar.VISIBLE);
+            btnSync.setEnabled(false);
+        }
+
+        @Override
+        protected Void doInBackground(String... arg0) {
+            //Цикл по объектам
+            if (count == 0) { return null; }
+
+            int i = 0;
+            for (final Photo photo : adapter.getGalleryList()) {
+                if (photo.getIssync() == 1) { continue; }
+                String response = (new NetworkCall()).fileUpload(inspection, photo);
+                if (response != null) {
+                    i += 1;
+                    sysHelper.getDbhelper().updPhotoSync(new String[]{response});
+                    photo.setIssync(1);
+                    publishProgress(i);
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            progress.setProgress(values[0]);
+            adapter.notifyDataSetChanged();
+        }
+
+        @Override
+        protected void onPostExecute(final Void unused){
+            progress.setVisibility(ProgressBar.INVISIBLE);
+            btnSync.setEnabled(true);
+            if (count != 0) {
+                sysHelper.showToAst("Все фотографии загружены");
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            progress.setMax(0);
+            progress.setVisibility(ProgressBar.INVISIBLE);
+            btnSync.setEnabled(true);
         }
     }
 
@@ -402,7 +472,6 @@ public class AddCarInspectionActivity extends AppCompatActivity {
             //(new RefreshList()).execute();
 
             // запишем информацию о фото в базу
-
             Photo photo = new Photo(0
                     ,sysHelper.getPhotoHelper().getmCurrentPhotoPath()
                     ,sysHelper.getPhotoHelper().getmCurrentPhotoName(), 0, inspection.get_inspectionid());
@@ -430,7 +499,7 @@ public class AddCarInspectionActivity extends AppCompatActivity {
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             ((GridLayoutManager) layoutManager).setSpanCount(4);
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT){
-            ((GridLayoutManager) layoutManager).setSpanCount(2);
+            ((GridLayoutManager) layoutManager).setSpanCount(3);
         }
     }
 
@@ -438,7 +507,7 @@ public class AddCarInspectionActivity extends AppCompatActivity {
         @Override
         public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                (new searchOrder()).execute();
+                (new SearchOrder()).execute();
 
                 InputMethodManager imm = (InputMethodManager)v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
@@ -448,7 +517,7 @@ public class AddCarInspectionActivity extends AppCompatActivity {
         }
     }
 
-    private static class searchOrder extends AsyncTask<String, Void, Void> {
+    private static class SearchOrder extends AsyncTask<String, Void, Void> {
         Order order = null;
 
         @Override
@@ -493,6 +562,7 @@ public class AddCarInspectionActivity extends AppCompatActivity {
             }
         }
     }
+
 
 }
 
